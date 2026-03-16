@@ -15,6 +15,7 @@ import VsiCanPythonGateway as vsiCanPythonGateway
 class MySignals:
 	def __init__(self):
 		# Inputs
+		self.pose_x = 0
 		self.pose_y = 0
 		self.pose_theta = 0
 
@@ -26,11 +27,14 @@ class MySignals:
 
 
 # Start of user custom code region. Please apply edits only within these regions:  Global Variables & Definitions
-kp = 1.5
-ki = 0.001
-kd = 2.0
+import numpy as np
+kp = 2
+ki = 0.00
+kd = 4.0
 prev_lateral_error = 0.0
 error_sum = 0.0
+def get_desired_y(x):
+    return 0.5 * np.sin(x * np.pi / 10.0)
 # End of user custom code region. Please don't edit beyond this point.
 class Controller:
 
@@ -72,7 +76,8 @@ class Controller:
 
 				# Start of user custom code region. Please apply edits only within these regions:  Inside the while loop
 				global prev_lateral_error, error_sum
-				lateral_error = 0.0 - self.mySignals.pose_y
+				desired_y = get_desired_y(self.mySignals.pose_x)
+				lateral_error = desired_y - self.mySignals.pose_y
 				heading_error = -self.mySignals.pose_theta
 				error_sum += lateral_error
 				error_diff = lateral_error - prev_lateral_error
@@ -88,12 +93,18 @@ class Controller:
 					raise Exception("stopRequested")
 
 				signalNumBytes = 8
+				receivedData = vsiCanPythonGateway.recvVariableFromCanPacket(signalNumBytes, 0, 64, 10)
+				self.mySignals.pose_x, receivedData = self.unpackBytes('d', receivedData, self.mySignals.pose_x)
+
+				signalNumBytes = 8
 				receivedData = vsiCanPythonGateway.recvVariableFromCanPacket(signalNumBytes, 0, 64, 11)
 				self.mySignals.pose_y, receivedData = self.unpackBytes('d', receivedData, self.mySignals.pose_y)
 
 				signalNumBytes = 8
 				receivedData = vsiCanPythonGateway.recvVariableFromCanPacket(signalNumBytes, 0, 64, 12)
 				self.mySignals.pose_theta, receivedData = self.unpackBytes('d', receivedData, self.mySignals.pose_theta)
+
+				
 
 				# Start of user custom code region. Please apply edits only within these regions:  Before sending the packet
 

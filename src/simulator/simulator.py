@@ -29,7 +29,7 @@ class MySignals:
 # Start of user custom code region. Please apply edits only within these regions:  Global Variables & Definitions
 import numpy as np
 current_x = 0.0
-current_y = 0.2
+current_y = 0.5
 current_theta = 0.0
 last_sim_time = 0
 # End of user custom code region. Please don't edit beyond this point.
@@ -83,7 +83,8 @@ class Simulator:
 					current_y += v * math.sin(current_theta) * dt
 					current_theta += w * dt
 					self.mySignals.pose_x = current_x
-					self.mySignals.pose_y = current_y
+					noise = np.random.normal(0, 0.02)
+					self.mySignals.pose_y = current_y + noise
 					self.mySignals.pose_theta = current_theta
 				# End of user custom code region. Please don't edit beyond this point.
 

@@ -22,6 +22,7 @@ class MySignals:
 
 
 # Start of user custom code region. Please apply edits only within these regions:  Global Variables & Definitions
+import numpy as np
 import matplotlib.pyplot as plt
 history_x = []
 history_y = []
@@ -65,12 +66,15 @@ class Plotter:
 			while(vsiCommonPythonApi.getSimulationTimeInNs() < self.totalSimulationTime):
 
 				# Start of user custom code region. Please apply edits only within these regions:  Inside the while loop
+				global history_x, history_y
 				history_x.append(self.mySignals.pose_x)
 				history_y.append(self.mySignals.pose_y)
 				if len(history_x) % 50 == 0:
 					plt.clf()
+					path_x = np.linspace(0, max(history_x)+1, 1000)
+					path_y = 0.5 * np.sin(path_x * np.pi / 10.0)
+					plt.plot(path_x, path_y, 'r--', label='Curved Path')
 					plt.plot(history_x, history_y, 'b-', label='Robot Path')
-					plt.axhline(0, color='r', linestyle='--', label='Target Line')
 					plt.xlabel('X Position')
 					plt.ylabel('Y Position')
 					plt.legend()
@@ -142,22 +146,22 @@ class Plotter:
 
 		# Start of user custom code region. Please apply edits only within these regions:  Protocol's callback function
 		if len(history_y) > 0:
-			crossed = [y for y in history_y if y < 0]
-			overshoot = abs(min(crossed)) if crossed else 0.0
-			steady_state_error = abs(history_y[-1])
+			lateral_errors = [abs(history_y[i] - 0.5 * np.sin(history_x[i] * np.pi / 10.0)) for i in range(len(history_y))]
+			overshoot = max(lateral_errors)
+			steady_state_error = lateral_errors[-1]
 			settling_time = None
-			for i in range(len(history_y)):
-				if all(abs(history_y[j]) < 0.05 for j in range(i, len(history_y))):
+			for i in range(len(lateral_errors)):
+				if all(lateral_errors[j] < 0.05 for j in range(i, len(lateral_errors))):
 					settling_time = i * 0.01
 					break
-			print("=== KPI Results ===")
+			print("=== E2 KPI Results ===")
 			print(f"Overshoot: {overshoot:.4f} m")
 			print(f"Steady State Error: {steady_state_error:.4f} m")
 			if settling_time:
 				print(f"Settling Time: {settling_time:.2f} s")
 			else:
 				print("Settling Time: Did not settle")
-			plt.savefig('trajectory_E1.png')
+			plt.savefig('trajectory_E2.png')
 		# End of user custom code region. Please don't edit beyond this point.
 
 
