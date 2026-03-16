@@ -1,0 +1,30 @@
+-N
+0 simulator 1
+pose_x double o 0
+pose_y double o 0
+pose_theta double o 0
+cmd_v double i 0
+cmd_w double i 0
+-N
+1 controller 1
+pose_y double i 0
+pose_theta double i 0
+cmd_v double o 0
+cmd_w double o 0
+-N
+2 plotter 1
+pose_x double i 0
+pose_y double i 0
+-CAN
+10 0 o [pose_x:0:64]
+11 0 o [pose_y:0:64]
+12 0 o [pose_theta:0:64]
+20 0 i [cmd_v:0:64]
+21 0 i [cmd_w:0:64]
+11 1 i [pose_y:0:64]
+12 1 i [pose_theta:0:64]
+20 1 o [cmd_v:0:64]
+21 1 o [cmd_w:0:64]
+10 2 i [pose_x:0:64]
+11 2 i [pose_y:0:64]
+-END
