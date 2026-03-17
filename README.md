@@ -24,7 +24,9 @@ Refer to the report for detailed KPI tables.
 Other Experiments > Note: Please switch to the other branch to view the source code for:
 
 E2 - Curved Path Robustness: Tracking piecewise circular arcs and Bezier-like paths.
+
 E3 - Noise Rejection: Testing robustness under varying Gaussian noise levels.
+
 E4 - PD vs. PID Ablation: Comparative study between PD and PID controllers under noisy conditions.
 
 ## Deliverables
